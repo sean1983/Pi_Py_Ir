@@ -18,22 +18,27 @@
 #   - Wouter De Droog	https://github.com/wouterdedroog)
 #   - Daniel Weidman	https://github.com/danielweidman)
 #   - Zach Resmer		https://github.com/zacharesmer)
+# demo_effect_cli.py
 """
 This script provides a command-line interface to send effects
-to the PixMob bracelets over IR directly from a Raspberry Pi.
+to PixMob bracelets over IR directly from a Raspberry Pi.
 
-Be sure to set your GPIO Pin in config file:
+Be sure to set your GPIO Pin in the config file:
 'pipyir/config.py'.
 """
 
-import pipyir.ir  # Import the ir module
-import pipyir.config as cfg  # Import configuration settings
-from pipyir.effect_definitions import base_color_effects, tail_codes, special_effects
 import time
 import argparse
 import logging
 from typing import Optional
 
+import pipyir.ir  # Import the ir module
+import pipyir.config as cfg  # Import configuration settings
+from pipyir.effect_definitions import (
+    base_color_effects,
+    tail_codes,
+    special_effects,
+)
 
 logging.basicConfig(
     level=logging.INFO,
@@ -60,9 +65,8 @@ def print_help():
         " ".join(tail_codes.keys()),
         "",
         "Example:",
-        " %s" % next(iter(base_color_effects.keys())),
-        " %s %s"
-        % (next(iter(base_color_effects.keys())), next(iter(tail_codes.keys()))),
+        f" {next(iter(base_color_effects.keys()))}",
+        f" {next(iter(base_color_effects.keys()))} {next(iter(tail_codes.keys()))}",
         sep="\n",
     )
 
@@ -75,7 +79,9 @@ def send_effect(
     :param effect_code: The main effect code (string)
     :param tail_code: The tail code (string or None)
     """
+    # Declare ir_sender as global to access the global instance
     global ir_sender
+
     effect_bits = []
 
     effect_code = effect_code.upper().strip()
@@ -86,7 +92,7 @@ def send_effect(
         effect_bits = special_effects[effect_code]
     else:
         LOG.warning(
-            "Invalid effect %s. See base_color_effects and "
+            "Invalid effect '%s'. See base_color_effects and "
             "special_effects in effect_definitions.py for options.",
             effect_code,
         )
@@ -100,7 +106,7 @@ def send_effect(
             effect_bits += tail_codes[tail_code]
         else:
             LOG.warning(
-                "Invalid tail code %s. See tail_codes "
+                "Invalid tail code '%s'. See tail_codes "
                 "in effect_definitions.py for options.",
                 tail_code,
             )
@@ -122,7 +128,9 @@ def repl_commands():
     """
     Starts a REPL loop to accept user commands interactively.
     """
-    print('Type "help" for a list of known commands, "exit" or "q" to quit.')
+    # Declare ir_sender as global to access the global instance
+    global ir_sender
+
     while True:
         try:
             cmd = input("Command> ")
@@ -130,7 +138,10 @@ def repl_commands():
             break
 
         # Split by space to add tail command after base command.
-        cmd = cmd.upper().split(" ")
+        cmd = cmd.upper().split()
+
+        if not cmd:
+            continue  # Skip empty input
 
         if cmd[0] == "EXIT" or cmd[0] == "Q":
             break
@@ -147,11 +158,15 @@ def main():
     """
     Main function to parse arguments and initiate command sending.
     """
+    # Declare ir_sender as global so it can be used in other functions
+    global ir_sender
+    # Initialize the IRSender
+    ir_sender = pipyir.ir.IRSender()
 
     parser = argparse.ArgumentParser(
         description=(
-            "Simple command-line loop to send effects "
-            "to the PixMob bracelet by typing in the effect names."
+            "Simple command-line interface to send effects "
+            "to the PixMob bracelets by typing in the effect names."
         )
     )
     parser.add_argument(
@@ -160,8 +175,8 @@ def main():
         action="store_true",
         default=False,
         help=(
-            "Set to True if you are passing the effect in the "
-            "command line, and want to still drop into the REPL."
+            "After sending the effect specified in the command line, "
+            "continue into the interactive CLI."
         ),
     )
 
@@ -177,10 +192,11 @@ def main():
         # If user has provided effect in arguments, send it directly
         if args.effect is not None:
             send_effect(args.effect, tail_code=args.tail_code)
-            # If the program should not go to the REPL after done, exit.
+            # If the program should not go to the repl after done, exit.
             if not args.continue_cli:
                 return
 
+        print('Type "help" for a list of known commands, "exit" or "q" to quit.')
         repl_commands()
     except Exception:
         LOG.exception("Uncaught exception occurred in the input loop. Full traceback:")
