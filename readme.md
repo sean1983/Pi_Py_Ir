@@ -2,9 +2,13 @@
 
 ### Overview
 
-**Pi Py Ir** is a Python-based IR (Infrared) transmitter solution for the Raspberry Pi. It allows you to control PixMob bracelets directly from a Raspberry Pi using Python scripts, eliminating the need for additional hardware like an Arduino. By utilizing the Raspberry Pi's GPIO pins and the `pigpio` library for precise timing, Pi Py Ir can send IR signals to PixMob bracelets to display various light effects.
+*Pi Py Ir* is a Python-based IR (Infrared) transmitter solution for the Raspberry Pi.
 
-The project includes a set of Python scripts and modules:
+It allows you to control PixMob bracelets directly from a Raspberry Pi using Python scripts, eliminating the need for additional hardware like an Arduino. 
+
+*Pi Py Ir* can send IR signals to PixMob bracelets to display various light effects.
+
+This includes a set of Python scripts and modules:
 
 - **pipyir**: A Python module that handles IR signal generation and transmission using the Raspberry Pi's GPIO pins.
 - **Effect Scripts**: Scripts like `demo_send_multiple_effects_advanced.py`, `demo_multiple_effects.py`, and `demo_single_effect.py` demonstrate how to send single or multiple effects to PixMob bracelets.
