@@ -36,7 +36,7 @@ EFFECTS_TO_SHOW = [
         "duration": 0.4
     },
     {
-        "main_effect": "TAYKAY_02",
+        "main_effect": "TAYLOR_02",
         "tail_code": None,
         "duration": 0.4
     },
